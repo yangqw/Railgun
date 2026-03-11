@@ -18,3 +18,7 @@ find feeds/passwall/ -name "Makefile" | xargs sed -i 's/$(1)\/usr\/bin\/xray/$(S
 # 2. 修改 SquashFS 块大小（从 256k 改为 1024k）
 # 这会让固件只读层的压缩率更高，通常能再省下 200-300KB
 sed -i 's/256k/1024k/g' target/linux/ramips/image/mt7621.mk
+
+# 3. 剔除没用的内核特性
+echo "CONFIG_KERNEL_DEBUG_INFO=n" >> .config
+echo "CONFIG_KERNEL_DEBUG_KERNEL=n" >> .config
