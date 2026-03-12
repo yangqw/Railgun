@@ -15,16 +15,20 @@ sed -i 's/FtSupport=0/FtSupport=1/g' package/lean/mt/drivers/mt_wifi/files/mt761
 # 注意：这会显著增加 GitHub Actions 的编译时间，但能省下约 1MB 空间
 find feeds/passwall/ -name "Makefile" | xargs sed -i 's/$(1)\/usr\/bin\/xray/$(STAGING_DIR_HOST)\/bin\/upx --ultra-brute $(1)\/usr\/bin\/xray/g'
 
-# 2. 修改 SquashFS 块大小（从 256k 改为 1024k）
+# 2. 强行删除固件内没用的大文件 (比如各种说明文档)
+rm -rf package/feeds/packages/node
+rm -rf package/feeds/packages/python
+
+# 3. 修改 SquashFS 块大小（从 256k 改为 1024k）
 # 这会让固件只读层的压缩率更高，通常能再省下 200-300KB
 sed -i 's/256k/1024k/g' target/linux/ramips/image/mt7621.mk
 
-# 3. 强制剔除内核中没用的驱动和调试符号
+# 4. 强制剔除内核中没用的驱动和调试符号
 echo "CONFIG_KERNEL_GZIP=y" >> .config
 echo "CONFIG_KERNEL_DEBUG_INFO=n" >> .config
 echo "CONFIG_KERNEL_DEBUG_KERNEL=n" >> .config
 echo "CONFIG_USB_SUPPORT=n" >> .config
 echo "CONFIG_STRIP_KERNEL_EXPORTS=y" >> .config
 
-# 4. 启用 mklibs 优化（通过减小库文件体积来节省空间）
+# 5. 启用 mklibs 优化（通过减小库文件体积来节省空间）
 echo "CONFIG_USE_MKLIBS=y" >> .config
